@@ -2,7 +2,14 @@
 
 var pecasPossiveis = ['L', 'I', 'Z', 'Zinver', 'squ']
 var coordPecaAtual
+var movimento = 1
 var tela = document.getElementById('tela')
+var tipoPecaAtual
+var pecaAtualEmMovimento = false
+var criar = true
+var mov
+var mousePos
+
 for(let c = 0; c < 20; c++){
     let linha = document.createElement('div')
     linha.id = 'linha' + (c + 1)
@@ -18,9 +25,8 @@ for(let c = 0; c < 20; c++){
     tela.appendChild(linha)
 
 }
-// setTimeout(function (){
-    startGame()
-// }, 2000)
+
+startGame()
 
 function startGame(){
     coordPecaAtual = []
@@ -29,13 +35,27 @@ function startGame(){
 
 function game(){
 
-    let peca = criarPeca()
+    
+    
+
+mov = setInterval(function (){
+    if(criar){
+        criarPeca()
+        criar = false
+    }
+    if(pecaAtualEmMovimento){
+        moverPeca()
+    }
+}, 1000);
+
+
+    
 
 }
 
 function criarPeca(){
     let esc = pecasPossiveis[Math.floor(Math.random() * (pecasPossiveis.length - 0.1))]
-    console.log(esc)
+    tipoPecaAtual = esc
     if(esc == 'L'){
         criarQuadrado(esc, [4, 0])
     }else if(esc == 'I'){
@@ -47,55 +67,84 @@ function criarPeca(){
     }else if(esc == 'squ'){
         criarQuadrado(esc, [4, 0])
     }
+    pecaAtualEmMovimento = true
 }
 
 function criarQuadrado(tipo, local){
     let locais
     if(tipo == 'L'){
         locais = [
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 2))],
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 3))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 3))],
-
+            [local[0], local[1]],
+            [local[0], local[1] + 1],
+            [local[0], local[1] + 2],
+            [local[0] + 1, local[1] + 2]
         ]
     }else if(tipo == 'I'){
         locais = [
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 3) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 4) + '-' + (local[1] + 1))],
-
+            [local[0], local[1]],
+            [local[0] + 1, local[1]],
+            [local[0] + 2, local[1]],
+            [local[0] + 3, local[1]]
         ]
     }else if(tipo == 'Z'){
         locais = [
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 2))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 2))],
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 3))],
-
+            [local[0] + 1, local[1]],
+            [local[0], local[1] + 1],
+            [local[0] + 1, local[1] + 1],
+            [local[0], local[1] + 2]
         ]
     }else if(tipo == 'Zinver'){
         locais = [
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 2))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 2))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 3))],
-
+            [local[0], local[1]],
+            [local[0], local[1] + 1],
+            [local[0] + 1, local[1] + 1],
+            [local[0] + 1, local[1] + 2]
         ]
     }else if(tipo == 'squ'){
         locais = [
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 1) + '-' + (local[1] + 2))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 1))],
-            [document.getElementById('espaco' + (local[0] + 2) + '-' + (local[1] + 2))],
-
+            [local[0], local[1]],
+            [local[0], local[1] + 1],
+            [local[0] + 1, local[1]],
+            [local[0] + 1, local[1] + 1]
         ]
     }
 
     for(let c = 0; c < locais.length; c++){
 
-       locais[c][0].classList.add(tipo)
+        document.getElementById('espaco' + (locais[c][0] + 1) + '-' + (locais[c][1] + 1)).classList.add(tipo)
     }
 
+    coordPecaAtual = locais
+
+}
+
+function moverPeca(){
+
+    
+    for(let c = 0; c < coordPecaAtual.length; c++){
+        document.getElementById('espaco' + (coordPecaAtual[c][0] + 1) + '-' + (coordPecaAtual[c][1] + 1)).classList.remove(tipoPecaAtual)
+        coordPecaAtual[c][1] += 1
+        if(coordPecaAtual[c][1] == 19){
+            pecaAtualEmMovimento = false
+        }else if(document.getElementById('espaco' + (coordPecaAtual[c][0] + 1) + '-' + (coordPecaAtual[c][1] + 2)).classList.length > 1){
+            pecaAtualEmMovimento = false
+        }
+    }
+    for(let c = 0; c < coordPecaAtual.length; c++){
+        document.getElementById('espaco' + (coordPecaAtual[c][0] + 1) + '-' + (coordPecaAtual[c][1] + 1)).classList.add(tipoPecaAtual)
+    }
+
+    let peca = document.getElementById('espaco' + (coordPecaAtual[1][0] + 1) + '-' + (coordPecaAtual[1][1] + 1))
+    
+    
+
+    if(!pecaAtualEmMovimento){
+        criar = true
+    }
+
+}
+
+function movMouse(event){
+    mousePos = event.clientX
+    
 }
